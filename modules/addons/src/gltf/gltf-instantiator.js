@@ -1,5 +1,5 @@
 import {Matrix4} from 'math.gl';
-import {Buffer, _Accessor as Accessor, GroupNode, log} from '@luma.gl/core';
+import {Buffer, _Accessor as Accessor, ScenegraphNode, log} from '@luma.gl/core';
 
 import GLTFAnimator from './gltf-animator';
 import createGLTFModel from './create-gltf-model';
@@ -48,7 +48,7 @@ export default class GLTFInstantiator {
   createScene(gltfScene) {
     const gltfNodes = gltfScene.nodes || [];
     const nodes = gltfNodes.map(node => this.createNode(node));
-    const scene = new GroupNode({
+    const scene = new ScenegraphNode({
       id: gltfScene.name || gltfScene.id,
       children: nodes
     });
@@ -65,7 +65,7 @@ export default class GLTFInstantiator {
         children.push(this.createMesh(gltfNode.mesh));
       }
 
-      const node = new GroupNode({
+      const node = new ScenegraphNode({
         id: gltfNode.name || gltfNode.id,
         children
       });
@@ -101,7 +101,7 @@ export default class GLTFInstantiator {
       const primitives = gltfPrimitives.map((gltfPrimitive, i) =>
         this.createPrimitive(gltfPrimitive, i, gltfMesh)
       );
-      const mesh = new GroupNode({
+      const mesh = new ScenegraphNode({
         id: gltfMesh.name || gltfMesh.id,
         children: primitives
       });

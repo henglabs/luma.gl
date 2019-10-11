@@ -125,10 +125,7 @@ export {default as PBRMaterial} from './materials/pbr-material';
 // SCENEGRAPH
 
 // Core nodes
-export {default as ScenegraphNode} from './scenegraph/nodes/scenegraph-node';
-export {default as GroupNode} from './scenegraph/nodes/group-node';
-export {default as ModelNode} from './scenegraph/nodes/model-node';
-export {default as CameraNode} from './scenegraph/nodes/camera-node';
+export {default as ScenegraphNode} from './scenegraph/scenegraph-node';
 
 // TODO/CLEAN UP FOR V7
 //  We should have a minimal set of forwarding exports from shadertools (ideally none)

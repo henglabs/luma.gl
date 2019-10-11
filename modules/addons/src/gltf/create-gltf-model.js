@@ -1,4 +1,4 @@
-import {isWebGL2, ModelNode, log, pbr} from '@luma.gl/core';
+import {isWebGL2, Model, ScenegraphNode, log, pbr} from '@luma.gl/core';
 import GLTFMaterialParser from './gltf-material-parser';
 
 const vs = `
@@ -77,25 +77,29 @@ export default function createGLTFModel(gl, options) {
   managedResources.push(...materialParser.generatedTextures);
   managedResources.push(...Object.values(attributes).map(attribute => attribute.buffer));
 
-  const model = new ModelNode(
-    gl,
-    Object.assign(
-      {
-        id,
-        drawMode,
-        vertexCount,
-        modules: [pbr],
-        defines: materialParser.defines,
-        parameters: materialParser.parameters,
-        vs: addVersionToShader(gl, vs),
-        fs: addVersionToShader(gl, fs),
-        managedResources
-      },
-      modelOptions
-    )
-  );
+  const model = new ScenegraphNode({
+    children: [
+      new Model(
+        gl,
+        Object.assign(
+          {
+            id,
+            drawMode,
+            vertexCount,
+            modules: [pbr],
+            defines: materialParser.defines,
+            parameters: materialParser.parameters,
+            vs: addVersionToShader(gl, vs),
+            fs: addVersionToShader(gl, fs),
+            managedResources
+          },
+          modelOptions
+        )
+      )
+    ]
+  });
 
-  model.setProps({attributes});
+  model.setAttributes(attributes);
   model.setUniforms(materialParser.uniforms);
 
   return model;

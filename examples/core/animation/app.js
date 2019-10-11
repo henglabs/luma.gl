@@ -1,6 +1,6 @@
 /* global document */
 
-import {AnimationLoop, setParameters, ModelNode, dirlight, CubeGeometry} from '@luma.gl/core';
+import {AnimationLoop, setParameters, Model, dirlight, CubeGeometry} from '@luma.gl/core';
 import {Timeline, KeyFrames} from '@luma.gl/addons';
 import {Matrix4, radians} from 'math.gl';
 
@@ -143,7 +143,7 @@ export default class AppAnimationLoop extends AnimationLoop {
         translation: translations[i],
         rotation: rotations[i],
         keyFrames: keyFrames[i],
-        model: new ModelNode(gl, {
+        model: new Model(gl, {
           vs,
           fs,
           modules: [dirlight],

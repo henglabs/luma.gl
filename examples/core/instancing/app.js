@@ -1,7 +1,8 @@
 import {
   AnimationLoop,
   setParameters,
-  ModelNode,
+  Model,
+  ScenegraphNode,
   picking,
   dirlight,
   readPixelsToArray,
@@ -45,7 +46,7 @@ createModuleInjection('picking', {
 });
 
 // Make a cube with 65K instances and attributes to control offset and color of each instance
-class InstancedCube extends ModelNode {
+class InstancedCube extends ScenegraphNode {
   constructor(gl, props) {
     let offsets = [];
     for (let i = 0; i < SIDE; i++) {
@@ -112,23 +113,27 @@ void main(void) {
     const colorsBuffer = new Buffer(gl, colors);
     const pickingColorsBuffer = new Buffer(gl, pickingColors);
 
-    super(
-      gl,
-      Object.assign({}, props, {
-        vs,
-        fs,
-        modules: [dirlight, picking],
-        isInstanced: 1,
-        instanceCount: SIDE * SIDE,
-        geometry: new CubeGeometry(),
-        attributes: {
-          instanceSizes: new Float32Array([1]), // Constant attribute
-          instanceOffsets: [offsetsBuffer, {divisor: 1}],
-          instanceColors: [colorsBuffer, {divisor: 1}],
-          instancePickingColors: [pickingColorsBuffer, {divisor: 1}]
-        }
-      })
-    );
+    super({
+      children: [
+        new Model(
+          gl,
+          Object.assign({}, props, {
+            vs,
+            fs,
+            modules: [dirlight, picking],
+            isInstanced: 1,
+            instanceCount: SIDE * SIDE,
+            geometry: new CubeGeometry(),
+            attributes: {
+              instanceSizes: new Float32Array([1]), // Constant attribute
+              instanceOffsets: [offsetsBuffer, {divisor: 1}],
+              instanceColors: [colorsBuffer, {divisor: 1}],
+              instancePickingColors: [pickingColorsBuffer, {divisor: 1}]
+            }
+          })
+        )
+      ]
+    });
   }
 }
 

@@ -5,7 +5,7 @@ import {parse} from '@loaders.gl/core';
 import {DracoLoader} from '@loaders.gl/draco';
 import '@loaders.gl/polyfills'; // text-encoding polyfill for older MS browsers
 import GL from '@luma.gl/constants';
-import {AnimationLoop, setParameters, clear, log, lumaStats} from '@luma.gl/core';
+import {AnimationLoop, setParameters, clear, log, lumaStats, Model} from '@luma.gl/core';
 import {
   GLTFScenegraphLoader,
   createGLTFObjects,
@@ -170,7 +170,7 @@ async function loadGLTF(urlOrPromise, gl, options) {
     DracoLoader
   });
 
-  scenes[0].traverse((node, {worldMatrix}) => log.info(4, 'Using model: ', node)());
+  scenes[0].traverse(node => log.info(4, 'Using model: ', node)());
   return {scenes, animator, gltf};
 }
 
@@ -452,24 +452,30 @@ export default class AppAnimationLoop extends AnimationLoop {
 
     let success = true;
 
-    this.scenes[0].traverse((model, {worldMatrix}) => {
+    this.scenes[0].compileMatrices(model => {
+      const worldMatrix = model.worldMatrix;
       // In glTF, meshes and primitives do no have their own matrix.
-      const u_MVPMatrix = new Matrix4(uProjection).multiplyRight(uView).multiplyRight(worldMatrix);
-      this.applyLight(model);
-      success =
-        success &&
-        model.draw({
-          uniforms: {
-            u_Camera: cameraPos,
-            u_MVPMatrix,
-            u_ModelMatrix: worldMatrix,
-            u_NormalMatrix: new Matrix4(worldMatrix).invert().transpose(),
 
-            u_ScaleDiffBaseMR: this.u_ScaleDiffBaseMR,
-            u_ScaleFGDSpec: this.u_ScaleFGDSpec
-          },
-          parameters: model.props.parameters
-        });
+      if (model.children[0] instanceof Model) {
+        const u_MVPMatrix = new Matrix4(uProjection)
+          .multiplyRight(uView)
+          .multiplyRight(worldMatrix);
+        this.applyLight(model);
+        success =
+          success &&
+          model.draw({
+            uniforms: {
+              u_Camera: cameraPos,
+              u_MVPMatrix,
+              u_ModelMatrix: worldMatrix,
+              u_NormalMatrix: new Matrix4(worldMatrix).invert().transpose(),
+
+              u_ScaleDiffBaseMR: this.u_ScaleDiffBaseMR,
+              u_ScaleFGDSpec: this.u_ScaleFGDSpec
+            },
+            parameters: model.props.parameters
+          });
+      }
     });
 
     return success;

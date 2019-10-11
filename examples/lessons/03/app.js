@@ -1,6 +1,6 @@
 /* eslint-disable array-bracket-spacing, no-multi-spaces */
 import GL from '@luma.gl/constants';
-import {AnimationLoop, Geometry, setParameters, ModelNode} from '@luma.gl/core';
+import {AnimationLoop, Geometry, setParameters, Model, ScenegraphNode} from '@luma.gl/core';
 import {Matrix4} from 'math.gl';
 
 const INFO_HTML = `
@@ -68,12 +68,20 @@ export default class AppAnimationLoop extends AnimationLoop {
     });
 
     return {
-      triangle: new ModelNode(gl, {
-        geometry: triangleGeometry,
-        vs: VERTEX_SHADER,
-        fs: FRAGMENT_SHADER
+      triangle: new ScenegraphNode({
+        children: [
+          new Model(gl, {
+            geometry: triangleGeometry,
+            vs: VERTEX_SHADER,
+            fs: FRAGMENT_SHADER
+          })
+        ]
       }),
-      square: new ModelNode(gl, {geometry: squareGeometry, vs: VERTEX_SHADER, fs: FRAGMENT_SHADER})
+      square: new ScenegraphNode({
+        children: [
+          new Model(gl, {geometry: squareGeometry, vs: VERTEX_SHADER, fs: FRAGMENT_SHADER})
+        ]
+      })
     };
   }
 

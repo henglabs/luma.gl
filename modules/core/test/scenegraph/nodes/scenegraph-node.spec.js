@@ -121,18 +121,95 @@ test('ScenegraphNode#update', t => {
   t.end();
 });
 
-test('ScenegraphNode#getCoordinateUniforms', t => {
-  const sgNode = new ScenegraphNode();
+test('ScenegraphNode#construction', t => {
+  const grandChild = new ScenegraphNode();
+  const child1 = new ScenegraphNode({children: [grandChild]});
+  const child2 = new ScenegraphNode();
+  const groupNode = new ScenegraphNode({children: [child1, child2]});
 
-  t.throws(() => sgNode.getCoordinateUniforms(), 'should throw on missing viewMatrix');
+  t.ok(child1 instanceof ScenegraphNode, 'construction with array is successful');
+  t.ok(groupNode instanceof ScenegraphNode, 'construction with object is successful');
 
-  const uniforms = sgNode.getCoordinateUniforms(new Matrix4());
-  t.ok(uniforms.viewMatrix, 'should return viewMatrix');
-  t.ok(uniforms.modelMatrix, 'should return modelMatrix');
-  t.ok(uniforms.objectMatrix, 'should return objectMatrix');
-  t.ok(uniforms.worldMatrix, 'should return worldMatrix');
-  t.ok(uniforms.worldInverseMatrix, 'should return worldInverseMatrix');
-  t.ok(uniforms.worldInverseTransposeMatrix, 'should return worldInverseTransposeMatrix');
+  t.end();
+});
+
+test('ScenegraphNode#add', t => {
+  const child1 = new ScenegraphNode();
+  const child2 = new ScenegraphNode();
+  const child3 = new ScenegraphNode();
+  const groupNode = new ScenegraphNode();
+
+  groupNode.add([child1, [child2, child3]]);
+
+  t.ok(groupNode.children.length === 3, 'add: should unpack nested arrays');
+  t.end();
+});
+
+test('ScenegraphNode#remove', t => {
+  const child1 = new ScenegraphNode();
+  const child2 = new ScenegraphNode();
+  const child3 = new ScenegraphNode();
+  const groupNode = new ScenegraphNode();
+
+  groupNode.add([child1, child2]);
+
+  groupNode.remove(child3);
+  t.ok(groupNode.children.length === 2, 'remove: should ignore non child node');
+
+  groupNode.remove(child2);
+  t.ok(groupNode.children.length === 1, 'remove: should remove child');
+  t.end();
+});
+
+test('ScenegraphNode#removeAll', t => {
+  const child1 = new ScenegraphNode();
+  const child2 = new ScenegraphNode();
+  const child3 = new ScenegraphNode();
+  const groupNode = new ScenegraphNode();
+  groupNode.add([child1, child2, child3]);
+
+  groupNode.removeAll();
+
+  t.ok(groupNode.children.length === 0, 'removeAll: should remove all');
+  t.end();
+});
+
+test('ScenegraphNode#delete', t => {
+  const grandChild = new ScenegraphNode();
+  const child1 = new ScenegraphNode({children: [grandChild]});
+  const child2 = new ScenegraphNode();
+  const groupNode = new ScenegraphNode({children: [child1, child2]});
+
+  groupNode.delete();
+
+  t.ok(groupNode.children.length === 0, 'delete: should remove all');
+  t.ok(child1.children.length === 0, 'delete: should delete children');
+  t.end();
+});
+
+test('ScenegraphNode#compileMatrices', t => {
+  const modelMatrices = {};
+  const matrix = new Matrix4().identity().scale(2);
+
+  function visitor(child) {
+    modelMatrices[child.id] = child.worldMatrix;
+  }
+
+  const childSNode = new ScenegraphNode({id: 'childSNode'});
+  const grandChildSNode = new ScenegraphNode({id: 'grandChildSNode'});
+  const child1 = new ScenegraphNode({id: 'child-1', matrix, children: [grandChildSNode]});
+  const groupNode = new ScenegraphNode({id: 'parent', matrix, children: [child1, childSNode]});
+
+  groupNode.compileMatrices();
+
+  groupNode.traverse(visitor);
+
+  t.deepEqual(modelMatrices[childSNode.id], matrix, 'should update child matrix');
+  t.deepEqual(
+    modelMatrices[grandChildSNode.id],
+    new Matrix4().identity().scale(4),
+    'should update grand child matrix'
+  );
 
   t.end();
 });

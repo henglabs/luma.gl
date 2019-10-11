@@ -2,12 +2,12 @@ import {
   AnimationLoop,
   setParameters,
   Model,
+  ScenegraphNode,
   clear,
   Framebuffer,
   Program,
   Geometry,
-  IcoSphereGeometry,
-  ModelNode
+  IcoSphereGeometry
 } from '@luma.gl/core';
 import {Matrix4, Vector3, radians} from 'math.gl';
 
@@ -145,12 +145,16 @@ export default class AppAnimationLoop extends AnimationLoop {
       geometry: quadGeometry
     });
 
-    sphere = new ModelNode(gl, {
-      id: 'electron',
-      geometry: new IcoSphereGeometry({
-        iterations: 4
-      }),
-      program: new Program(gl, {vs: SPHERE_VS, fs: SPHERE_FS})
+    sphere = new ScenegraphNode({
+      children: [
+        new Model(gl, {
+          id: 'electron',
+          geometry: new IcoSphereGeometry({
+            iterations: 4
+          }),
+          program: new Program(gl, {vs: SPHERE_VS, fs: SPHERE_FS})
+        })
+      ]
     });
 
     const dt = 0.0125;

@@ -1,4 +1,4 @@
-import {Program, Geometry, ModelNode} from '@luma.gl/core';
+import {Program, Geometry, ScenegraphNode, Model} from '@luma.gl/core';
 
 const VERTEX_SHADER = `\
 attribute vec3 positions;
@@ -29,45 +29,49 @@ void main(void) {
 }
 `;
 
-export class Star extends ModelNode {
+export class Star extends ScenegraphNode {
   constructor(gl, opts = {}) {
     const program = new Program(gl, {
       fs: FRAGMENT_SHADER,
       vs: VERTEX_SHADER
     });
 
-    super(gl, {
-      program,
-      geometry: new Geometry({
-        attributes: {
-          // prettier-ignore
-          positions: new Float32Array([
-            -1.0, -1.0, 0.0,
-            1.0, -1.0, 0.0,
-            -1.0, 1.0, 0.0,
-            1.0, 1.0, 0.0
-          ]),
-          // prettier-ignore
-          texCoords: new Float32Array([
-            0.0, 0.0,
-            1.0, 0.0,
-            0.0, 1.0,
-            1.0, 1.0
-          ]),
-          indices: new Uint16Array([0, 1, 3, 3, 2, 0])
-        }
-      }),
-      uniforms: {
-        uSampler: opts.texture
-      },
-      onBeforeRender: () => {
-        // TODO: Fix this so user can control this with a check-box
-        const isTwinkle = false; // twinkle.checked;
-        const r = isTwinkle ? Math.min(1, this.r + this.twinklerR) : this.r;
-        const g = isTwinkle ? Math.min(1, this.g + this.twinklerG) : this.g;
-        const b = isTwinkle ? Math.min(1, this.b + this.twinklerB) : this.b;
-        this.setUniforms({uColor: [r, g, b]});
-      }
+    super({
+      children: [
+        new Model(gl, {
+          program,
+          geometry: new Geometry({
+            attributes: {
+              // prettier-ignore
+              positions: new Float32Array([
+                -1.0, -1.0, 0.0,
+                1.0, -1.0, 0.0,
+                -1.0, 1.0, 0.0,
+                1.0, 1.0, 0.0
+              ]),
+              // prettier-ignore
+              texCoords: new Float32Array([
+                0.0, 0.0,
+                1.0, 0.0,
+                0.0, 1.0,
+                1.0, 1.0
+              ]),
+              indices: new Uint16Array([0, 1, 3, 3, 2, 0])
+            }
+          }),
+          uniforms: {
+            uSampler: opts.texture
+          },
+          onBeforeRender: () => {
+            // TODO: Fix this so user can control this with a check-box
+            const isTwinkle = false; // twinkle.checked;
+            const r = isTwinkle ? Math.min(1, this.r + this.twinklerR) : this.r;
+            const g = isTwinkle ? Math.min(1, this.g + this.twinklerG) : this.g;
+            const b = isTwinkle ? Math.min(1, this.b + this.twinklerB) : this.b;
+            this.setUniforms({uColor: [r, g, b]});
+          }
+        })
+      ]
     });
 
     this.angle = 0;

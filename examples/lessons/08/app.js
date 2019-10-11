@@ -1,6 +1,6 @@
 /* eslint-disable max-statements, array-bracket-spacing, no-multi-spaces */
 import GL from '@luma.gl/constants';
-import {AnimationLoop, Texture2D, setParameters, ModelNode, CubeGeometry} from '@luma.gl/core';
+import {AnimationLoop, Texture2D, setParameters, Model, CubeGeometry} from '@luma.gl/core';
 import {Matrix4} from 'math.gl';
 
 const INFO_HTML = `
@@ -194,7 +194,7 @@ export default class AppAnimationLoop extends AnimationLoop {
       }
     });
     return {
-      cube: new ModelNode(gl, {
+      cube: new Model(gl, {
         geometry: new CubeGeometry(),
         vs: VERTEX_SHADER,
         fs: FRAGMENT_SHADER,

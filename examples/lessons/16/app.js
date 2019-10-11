@@ -18,7 +18,6 @@ import {
   Framebuffer,
   setParameters,
   loadFile,
-  ModelNode,
   CubeGeometry,
   SphereGeometry
 } from '@luma.gl/core';
@@ -227,7 +226,7 @@ export default class AppAnimationLoop extends AnimationLoop {
         uniforms: Object.assign({}, getLaptopUniforms(), getLightUniforms())
       });
 
-      const moon = new ModelNode(gl, {
+      const moon = new Model(gl, {
         geometry: new SphereGeometry({
           nlat: 30,
           nlong: 30,
@@ -242,7 +241,7 @@ export default class AppAnimationLoop extends AnimationLoop {
         )
       });
 
-      const cube = new ModelNode(gl, {
+      const cube = new Model(gl, {
         id: 'cube-model',
         geometry: new CubeGeometry(),
         vs: VERTEX_SHADER,

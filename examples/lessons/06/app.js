@@ -4,7 +4,7 @@ import {
   Texture2D,
   setParameters,
   loadImage,
-  ModelNode,
+  Model,
   CubeGeometry
 } from '@luma.gl/core';
 import {Matrix4} from 'math.gl';
@@ -95,7 +95,7 @@ export default class AppAnimationLoop extends AnimationLoop {
     const image = loadImage('crate.gif');
 
     return {
-      cube: new ModelNode(gl, {
+      cube: new Model(gl, {
         geometry: new CubeGeometry(),
         vs: VERTEX_SHADER,
         fs: FRAGMENT_SHADER
